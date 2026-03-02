@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>Perang Kertas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #333;
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* ===== MAIN MENU ===== */
+        #mainMenu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+
+        .menu-container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: clamp(20px, 5vw, 40px);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .menu-container h1 {
+            color: white;
+            font-size: clamp(32px, 8vw, 48px);
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .menu-container p {
+            color: #fff;
+            font-size: clamp(14px, 4vw, 18px);
+            margin-bottom: 30px;
+        }
+
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: clamp(12px 20px, 3vw 5vw, 15px 30px);
+            font-size: clamp(14px, 4vw, 18px);
+            cursor: pointer;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            transition: all 0.3s;
+            font-weight: bold;
+            width: 100%;
+        }
+
+        button:hover {
+            background: #229954;
+            transform: scale(1.05);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .btn-single {
+            background: #3498db;
+        }
+
+        .btn-single:hover {
+            background: #2980b9;
+        }
+
+        .btn-double {
+            background: #e74c3c;
+        }
+
+        .btn-double:hover {
+            background: #c0392b;
+        }
+
+        /* ===== SETUP MENU ===== */
+        #setupMenu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            flex-direction: column;
+            z-index: 1999;
+        }
+
+        .setup-header {
+            background: #2c3e50;
+            color: white;
+            padding: clamp(15px, 3vw, 20px);
+            text-align: center;
+            font-size: clamp(20px, 5vw, 28px);
+            font-weight: bold;
+        }
+
+        .setup-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            flex-direction: column;
+        }
+
+        @media (min-width: 768px) {
+            .setup-content {
+                flex-direction: row;
+            }
+        }
+
+        .setup-panel {
+            flex: 1;
+            padding: clamp(10px, 3vw, 20px);
+            border-right: 2px solid #444;
+            overflow-y: auto;
+            border-bottom: 2px solid #444;
+        }
+
+        @media (min-width: 768px) {
+            .setup-panel {
+                border-bottom: none;
+            }
+
+            .setup-panel:last-child {
+                border-right: none;
+            }
+        }
+
+        .setup-panel h2 {
+            color: white;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: clamp(16px, 4vw, 20px);
+        }
+
+        .unit-selector {
+            background: #34495e;
+            padding: clamp(10px, 2vw, 15px);
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+            cursor: pointer;
+            color: white;
+            transition: all 0.3s;
+            font-size: clamp(12px, 3vw, 14px);
+        }
+
+        .unit-selector:hover {
+            background: #2c3e50;
+            border-left-color: #2980b9;
+        }
+
+        .unit-selector.active {
+            background: #3498db;
+            border-left-color: #2980b9;
+        }
+
+        .unit-selector.p2 {
+            border-left-color: #e74c3c;
+        }
+
+        .unit-selector.p2.active {
+            background: #e74c3c;
+        }
+
+        .canvas-container {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        #setupCanvas {
+            border: 3px solid #555;
+            cursor: crosshair;
+            width: 100%;
+            height: 100%;
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .setup-instructions {
+            color: #ecf0f1;
+            font-size: clamp(12px, 3vw, 14px);
+            text-align: center;
+            margin-top: 10px;
+            padding: 10px;
+            background: #1c2833;
+            border-radius: 5px;
+        }
+
+        .setup-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .setup-buttons button {
+            flex: 1;
+            padding: 10px;
+            min-width: 100px;
+            font-size: clamp(12px, 3vw, 14px);
+        }
+
+        .setup-footer {
+            background: #2c3e50;
+            padding: clamp(10px, 2vw, 15px);
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .setup-footer button {
+            flex: 1;
+            min-width: 120px;
+            font-size: clamp(12px, 3vw, 16px);
+        }
+
+        /* ===== GAME UI ===== */
+        #ui {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: clamp(8px, 2vw, 15px);
+            font-size: clamp(12px, 3vw, 18px);
+            font-weight: bold;
+            z-index: 500;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        #gameCanvas {
+            display: block;
+            background: #ffffff;
+            border: 5px solid #444;
+            width: 100%;
+            height: calc(100% - 60px);
+            margin-top: 60px;
+        }
+
+        /* ===== OVERLAY ===== */
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .game-info {
+            background: rgba(0, 0, 0, 0.7);
+            padding: clamp(15px, 5vw, 25px);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            color: #ecf0f1;
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        #msg {
+            font-size: clamp(28px, 8vw, 42px);
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        #subMsg {
+            font-size: clamp(14px, 4vw, 18px);
+            margin-bottom: 20px;
+        }
+
+        #overlay button {
+            padding: clamp(12px 30px, 3vw 8vw, 15px 40px);
+            font-size: clamp(14px, 4vw, 18px);
+        }
+
+        /* ===== RESPONSIVE ADJUSTMENTS ===== */
+        @media (max-width: 480px) {
+            body {
+                font-size: 14px;
+            }
+
+            .button-group {
+                gap: 10px;
+            }
+
+            .setup-content {
+                gap: 0;
+            }
+
+            .setup-panel {
+                max-height: 35vh;
+            }
+
+            .canvas-container {
+                max-height: 30vh;
+            }
+        }
+
+        @media (max-width: 768px) {
+            #ui {
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .menu-container {
+                margin: auto;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .button-group {
+                flex-direction: row;
+            }
+
+            .setup-content {
+                flex-direction: row;
+            }
+
+            .setup-footer {
+                flex-direction: row;
+            }
+
+            .setup-footer button {
+                max-width: 300px;
+            }
+        }
+
+        /* Landscape mode */
+        @media (max-height: 500px) {
+            .menu-container {
+                padding: 15px;
+            }
+
+            .menu-container h1 {
+                margin-bottom: 10px;
+            }
+
+            .menu-container p {
+                margin-bottom: 15px;
+            }
+
+            .button-group {
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- MENU UTAMA -->
+<div id="mainMenu">
+    <div class="menu-container">
+        <h1>⚔️ PERANG KERTAS ⚔️</h1>
+        <p>Pilih Mode Permainan</p>
+        <div class="button-group">
+            <button class="btn-single" onclick="selectMode('single')">🤖 Single Player<br>(vs Komputer)</button>
+            <button class="btn-double" onclick="selectMode('double')">👥 Double Player<br>(1 vs 1)</button>
+        </div>
+    </div>
+</div>
+
+<!-- SETUP MENU -->
+<div id="setupMenu">
+    <div class="setup-header">⚙️ SUSUN POSISI PASUKAN</div>
+    <div class="setup-content">
+        <div class="setup-panel" id="setupPanel1">
+            <h2>👤 Pemain 1</h2>
+            <div id="unitListP1"></div>
+            <div class="setup-buttons">
+                <button onclick="resetUnits(1)" style="background: #e67e22;">Reset P1</button>
+                <button onclick="randomUnits(1)" style="background: #27ae60;">Random P1</button>
+            </div>
+        </div>
+
+        <div class="canvas-container">
+            <div style="width: 100%; height: 100%; display: flex; flex-direction: column;">
+                <canvas id="setupCanvas"></canvas>
+                <div class="setup-instructions" id="setupInstructions">
+                    Klik unit, lalu klik canvas untuk menempatkan
+                </div>
+            </div>
+        </div>
+
+        <div class="setup-panel" id="setupPanel2">
+            <h2>👤 Pemain 2</h2>
+            <div id="unitListP2"></div>
+            <div class="setup-buttons">
+                <button onclick="resetUnits(2)" style="background: #e67e22;">Reset P2</button>
+                <button onclick="randomUnits(2)" style="background: #27ae60;">Random P2</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="setup-footer">
+        <button onclick="goBackToMenu()" style="background: #95a5a6;">← Kembali</button>
+        <button onclick="startGame()" style="background: #27ae60; padding: 15px 50px;">▶️ Mulai</button>
+    </div>
+</div>
+
+<!-- GAME UI -->
+<div id="ui">
+    <div>P1: <span id="s1">0</span></div>
+    <div id="turnTag">GILIRAN: P1</div>
+    <div>P2: <span id="s2">0</span></div>
+</div>
+
+<!-- OVERLAY -->
+<div id="overlay">
+    <div class="game-info">
+        <div id="msg">PERANG KERTAS</div>
+        <p id="subMsg">Klik untuk mulai</p>
+    </div>
+    <button onclick="nextTurn()">SIAP!</button>
+</div>
+
+<canvas id="gameCanvas"></canvas>
+
+<script>
+// ===== GLOBAL VARIABLES =====
+let gameMode = null;
+let setupMode = false;
+let gameStarted = false;
+
+// ===== AUDIO SYSTEM =====
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+
+function getAudioCtx() {
+    if (!audioCtx) audioCtx = new AudioCtx();
+    return audioCtx;
+}
+
+function playShootSound() {
+    try {
+        const ctx = getAudioCtx();
+        // Cannon boom: short low thud + noise burst
+        const bufLen = ctx.sampleRate * 0.25;
+        const buffer = ctx.createBuffer(1, bufLen, ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufLen; i++) {
+            const t = i / ctx.sampleRate;
+            data[i] = (Math.random() * 2 - 1) * Math.exp(-t * 20) * 0.8
+                    + Math.sin(2 * Math.PI * 80 * t) * Math.exp(-t * 15) * 0.6;
+        }
+        const src = ctx.createBufferSource();
+        src.buffer = buffer;
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(1, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+        src.connect(gain);
+        gain.connect(ctx.destination);
+        src.start();
+    } catch(e) {}
+}
+
+function playHitSound() {
+    try {
+        const ctx = getAudioCtx();
+        // Explosion: rumble + debris
+        const bufLen = ctx.sampleRate * 0.6;
+        const buffer = ctx.createBuffer(1, bufLen, ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufLen; i++) {
+            const t = i / ctx.sampleRate;
+            data[i] = (Math.random() * 2 - 1) * Math.exp(-t * 8) * 1.0
+                    + Math.sin(2 * Math.PI * 55 * t) * Math.exp(-t * 6) * 0.5
+                    + Math.sin(2 * Math.PI * 30 * t) * Math.exp(-t * 4) * 0.4;
+        }
+        const src = ctx.createBufferSource();
+        src.buffer = buffer;
+        // Distortion for crunch
+        const wave = ctx.createWaveShaper();
+        const curve = new Float32Array(256);
+        for (let i = 0; i < 256; i++) { const x = (i * 2) / 256 - 1; curve[i] = (Math.PI + 200) * x / (Math.PI + 200 * Math.abs(x)); }
+        wave.curve = curve;
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(1.5, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
+        src.connect(wave);
+        wave.connect(gain);
+        gain.connect(ctx.destination);
+        src.start();
+    } catch(e) {}
+}
+
+function playMissSound() {
+    try {
+        const ctx = getAudioCtx();
+        // Whoosh + soft thud
+        const bufLen = ctx.sampleRate * 0.3;
+        const buffer = ctx.createBuffer(1, bufLen, ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufLen; i++) {
+            const t = i / ctx.sampleRate;
+            const freq = 600 - t * 1200;
+            data[i] = Math.sin(2 * Math.PI * freq * t) * Math.exp(-t * 10) * 0.4
+                    + (Math.random() * 2 - 1) * Math.exp(-t * 8) * 0.2;
+        }
+        const src = ctx.createBufferSource();
+        src.buffer = buffer;
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.5, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+        src.connect(gain);
+        gain.connect(ctx.destination);
+        src.start();
+    } catch(e) {}
+}
+
+function playVictorySound() {
+    try {
+        const ctx = getAudioCtx();
+        const notes = [523, 659, 784, 1047];
+        notes.forEach((freq, i) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.frequency.value = freq;
+            osc.type = 'square';
+            gain.gain.setValueAtTime(0, ctx.currentTime + i * 0.15);
+            gain.gain.linearRampToValueAtTime(0.3, ctx.currentTime + i * 0.15 + 0.05);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.15 + 0.3);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(ctx.currentTime + i * 0.15);
+            osc.stop(ctx.currentTime + i * 0.15 + 0.3);
+        });
+    } catch(e) {}
+}
+
+const canvasGame = document.getElementById('gameCanvas');
+const ctxGame = canvasGame.getContext('2d');
+
+const canvasSetup = document.getElementById('setupCanvas');
+const ctxSetup = canvasSetup.getContext('2d');
+
+let p1Units = [], p2Units = [];
+let p1Score = 0, p2Score = 0;
+let shots = [];
+let explosions = [];
+let currentPlayer = 1;
+let selectedUnit = null;
+let midX = 0;
+
+class Unit {
+    constructor(x, y, type, player) {
+        this.x = x;
+        this.y = y;
+        this.type = type;
+        this.alive = true;
+        this.player = player;
+    }
+}
+
+// ===== RESIZE HANDLER =====
+function resizeCanvas() {
+    if (!setupMode && gameStarted) {
+        const oldWidth = canvasGame.width;
+        const oldHeight = canvasGame.height;
+        canvasGame.width = window.innerWidth;
+        canvasGame.height = window.innerHeight - 60;
+        midX = canvasGame.width / 2;
+
+        // Rescale unit positions proportionally
+        if (oldWidth > 0 && oldHeight > 0) {
+            const sx = canvasGame.width / oldWidth;
+            const sy = canvasGame.height / oldHeight;
+            [...p1Units, ...p2Units].forEach(u => {
+                u.x *= sx;
+                u.y *= sy;
+            });
+        }
+    }
+}
+
+window.addEventListener('resize', resizeCanvas);
+window.addEventListener('orientationchange', () => {
+    setTimeout(resizeCanvas, 100);
+});
+
+// ===== SETUP FUNCTIONS =====
+function initSetup() {
+    setupMode = true;
+    document.getElementById('setupMenu').style.display = 'flex';
+    document.getElementById('mainMenu').style.display = 'none';
+
+    canvasSetup.width = canvasSetup.offsetWidth || 400;
+    canvasSetup.height = canvasSetup.offsetHeight || 400;
+
+    p1Units = [];
+    p2Units = [];
+
+    for (let i = 0; i < 3; i++) {
+        p1Units.push(new Unit(0, 0, 'tank', 1));
+        p1Units.push(new Unit(0, 0, 'soldier', 1));
+        p2Units.push(new Unit(0, 0, 'tank', 2));
+        p2Units.push(new Unit(0, 0, 'soldier', 2));
+    }
+
+    updateUnitLists();
+    drawSetup();
+    setupCanvasEvents();
+}
+
+function updateUnitLists() {
+    const p1List = document.getElementById('unitListP1');
+    const p2List = document.getElementById('unitListP2');
+
+    p1List.innerHTML = '';
+    p2List.innerHTML = '';
+
+    p1Units.forEach((unit) => {
+        const div = document.createElement('div');
+        div.className = 'unit-selector' + (selectedUnit === unit ? ' active' : '');
+        div.innerHTML = `<strong>${unit.type.toUpperCase()}</strong><br>` +
+            (unit.x ? `📍 (${Math.round(unit.x)}, ${Math.round(unit.y)})` : '❌ Belum ditempatkan');
+        div.onclick = () => selectUnit(unit, div);
+        p1List.appendChild(div);
+    });
+
+    p2Units.forEach((unit) => {
+        const div = document.createElement('div');
+        div.className = 'unit-selector p2' + (selectedUnit === unit ? ' active' : '');
+        div.innerHTML = `<strong>${unit.type.toUpperCase()}</strong><br>` +
+            (unit.x ? `📍 (${Math.round(unit.x)}, ${Math.round(unit.y)})` : '❌ Belum ditempatkan');
+        div.onclick = () => selectUnit(unit, div);
+        p2List.appendChild(div);
+    });
+}
+
+function selectUnit(unit, element) {
+    selectedUnit = unit;
+    document.querySelectorAll('.unit-selector').forEach(el => el.classList.remove('active'));
+    element.classList.add('active');
+    updateInstructions(`Tempatkan ${unit.type} Pemain ${unit.player}`);
+}
+
+function updateInstructions(text) {
+    document.getElementById('setupInstructions').innerText = text;
+}
+
+function setupCanvasEvents() {
+    function handleSetupClick(clientX, clientY) {
+        if (!selectedUnit) {
+            updateInstructions('⚠️ Pilih unit terlebih dahulu!');
+            return;
+        }
+
+        const rect = canvasSetup.getBoundingClientRect();
+        const scaleX = canvasSetup.width / rect.width;
+        const scaleY = canvasSetup.height / rect.height;
+        const x = (clientX - rect.left) * scaleX;
+        const y = (clientY - rect.top) * scaleY;
+
+        const midXSetup = canvasSetup.width / 2;
+
+        // Validasi zona: P1 hanya boleh di kiri, P2 hanya boleh di kanan
+        if (selectedUnit.player === 1 && x > midXSetup) {
+            updateInstructions('⚠️ Pemain 1 hanya boleh menempatkan unit di sisi KIRI!');
+            return;
+        }
+        if (selectedUnit.player === 2 && x < midXSetup) {
+            updateInstructions('⚠️ Pemain 2 hanya boleh menempatkan unit di sisi KANAN!');
+            return;
+        }
+
+        selectedUnit.x = x;
+        selectedUnit.y = y;
+
+        updateUnitLists();
+        drawSetup();
+        updateInstructions(`✅ ${selectedUnit.type} ditempatkan! Pilih unit lain.`);
+    }
+
+    canvasSetup.addEventListener('click', (e) => {
+        handleSetupClick(e.clientX, e.clientY);
+    });
+
+    canvasSetup.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        const touch = e.changedTouches[0];
+        handleSetupClick(touch.clientX, touch.clientY);
+    }, { passive: false });
+}
+
+function drawSetup() {
+    ctxSetup.fillStyle = '#f0f0f0';
+    ctxSetup.fillRect(0, 0, canvasSetup.width, canvasSetup.height);
+
+    const midX = canvasSetup.width / 2;
+
+    ctxSetup.setLineDash([10, 10]);
+    ctxSetup.strokeStyle = '#ccc';
+    ctxSetup.lineWidth = 2;
+    ctxSetup.beginPath();
+    ctxSetup.moveTo(midX, 0);
+    ctxSetup.lineTo(midX, canvasSetup.height);
+    ctxSetup.stroke();
+    ctxSetup.setLineDash([]);
+
+    ctxSetup.fillStyle = '#999';
+    ctxSetup.font = `bold ${Math.max(12, canvasSetup.width / 40)}px Arial`;
+    ctxSetup.textAlign = 'center';
+    ctxSetup.fillText('PEMAIN 1', canvasSetup.width / 4, 30);
+    ctxSetup.fillText('PEMAIN 2', (canvasSetup.width * 3) / 4, 30);
+
+    [...p1Units, ...p2Units].forEach(unit => {
+        if (unit.x && unit.y) {
+            const isP1 = unit.player === 1;
+            if (unit.type === 'tank') {
+                drawTankSetup(unit.x, unit.y, isP1);
+            } else {
+                drawSoldierSetup(unit.x, unit.y, isP1);
+            }
+        }
+    });
+
+    if (selectedUnit && selectedUnit.x && selectedUnit.y) {
+        ctxSetup.strokeStyle = '#ffff00';
+        ctxSetup.lineWidth = 3;
+        ctxSetup.beginPath();
+        ctxSetup.arc(selectedUnit.x, selectedUnit.y, 40, 0, Math.PI * 2);
+        ctxSetup.stroke();
+    }
+}
+
+function drawTankSetup(x, y, isP1) {
+    drawTankIcon(ctxSetup, x, y, 0.7, isP1);
+}
+
+function drawSoldierSetup(x, y, isP1) {
+    drawSoldierIcon(ctxSetup, x, y, 0.6, isP1);
+}
+
+function resetUnits(player) {
+    const units = player === 1 ? p1Units : p2Units;
+    units.forEach(u => {
+        u.x = 0;
+        u.y = 0;
+    });
+    updateUnitLists();
+    drawSetup();
+}
+
+function randomUnits(player) {
+    const units = player === 1 ? p1Units : p2Units;
+    const margin = 50;
+    const minX = player === 1 ? margin : canvasSetup.width / 2 + margin;
+    const maxX = player === 1 ? canvasSetup.width / 2 - margin : canvasSetup.width - margin;
+
+    units.forEach(unit => {
+        unit.x = Math.random() * (maxX - minX) + minX;
+        unit.y = Math.random() * (canvasSetup.height - 100) + 50;
+    });
+
+    updateUnitLists();
+    drawSetup();
+}
+
+function goBackToMenu() {
+    setupMode = false;
+    document.getElementById('setupMenu').style.display = 'none';
+    document.getElementById('mainMenu').style.display = 'flex';
+}
+
+function selectMode(mode) {
+    gameMode = mode;
+    initSetup();
+}
+
+function startGame() {
+    const allUnits = [...p1Units, ...p2Units];
+    if (allUnits.some(u => !u.x || !u.y)) {
+        alert('⚠️ Semua unit harus ditempatkan terlebih dahulu!');
+        return;
+    }
+
+    setupMode = false;
+    gameStarted = true;
+    document.getElementById('setupMenu').style.display = 'none';
+    document.getElementById('overlay').style.display = 'flex';
+
+    // Initialize game canvas
+    canvasGame.width = window.innerWidth;
+    canvasGame.height = window.innerHeight - 60;
+    midX = canvasGame.width / 2;
+
+    // Scale unit positions from setup canvas to game canvas
+    const scaleX = canvasGame.width / canvasSetup.width;
+    const scaleY = canvasGame.height / canvasSetup.height;
+    [...p1Units, ...p2Units].forEach(u => {
+        u.x = u.x * scaleX;
+        u.y = u.y * scaleY;
+    });
+
+    p1Score = 0;
+    p2Score = 0;
+    shots = [];
+    explosions = [];
+    currentPlayer = 1;
+
+    gameLoop();
+}
+
+// ===== SHARED DRAW HELPERS =====
+
+/**
+ * Draw a realistic top-down tank
+ * cx,cy = center, s = scale (1 = normal), isP1 = team color, ctx = canvas context, dir = direction of barrel (-1=left, 1=right)
+ */
+function drawTankIcon(ctx, cx, cy, s, isP1) {
+    const dir = isP1 ? 1 : -1; // P1 (left side) barrel faces RIGHT, P2 (right side) faces LEFT
+
+    const trackColor   = isP1 ? '#1a3a5c' : '#5c1a1a';
+    const trackHigh    = isP1 ? '#2471a3' : '#a93226';
+    const hullColor    = isP1 ? '#2980b9' : '#c0392b';
+    const hullHigh     = isP1 ? '#3498db' : '#e74c3c';
+    const turretColor  = isP1 ? '#1c4e7a' : '#7b241c';
+    const barrelColor  = isP1 ? '#154360' : '#641e16';
+    const detailColor  = isP1 ? '#85c1e9' : '#f1948a';
+
+    ctx.save();
+    ctx.translate(cx, cy);
+
+    // === LEFT TRACK ===
+    ctx.fillStyle = trackColor;
+    roundRect(ctx, -22*s, -18*s, 10*s, 36*s, 4*s);
+    ctx.fill();
+    // track highlight lines
+    ctx.strokeStyle = trackHigh;
+    ctx.lineWidth = 1*s;
+    for (let i = 0; i < 5; i++) {
+        ctx.beginPath();
+        ctx.moveTo(-21*s, (-14 + i*7)*s);
+        ctx.lineTo(-13*s, (-14 + i*7)*s);
+        ctx.stroke();
+    }
+
+    // === RIGHT TRACK ===
+    ctx.fillStyle = trackColor;
+    roundRect(ctx, 12*s, -18*s, 10*s, 36*s, 4*s);
+    ctx.fill();
+    ctx.strokeStyle = trackHigh;
+    for (let i = 0; i < 5; i++) {
+        ctx.beginPath();
+        ctx.moveTo(13*s, (-14 + i*7)*s);
+        ctx.lineTo(21*s, (-14 + i*7)*s);
+        ctx.stroke();
+    }
+
+    // === HULL body ===
+    ctx.fillStyle = hullColor;
+    roundRect(ctx, -12*s, -14*s, 24*s, 28*s, 3*s);
+    ctx.fill();
+    // Hull highlight
+    ctx.fillStyle = hullHigh;
+    roundRect(ctx, -10*s, -12*s, 20*s, 10*s, 2*s);
+    ctx.fill();
+    // Hull detail lines
+    ctx.strokeStyle = turretColor;
+    ctx.lineWidth = 1*s;
+    ctx.beginPath();
+    ctx.moveTo(-11*s, 2*s);
+    ctx.lineTo(11*s, 2*s);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(-11*s, 8*s);
+    ctx.lineTo(11*s, 8*s);
+    ctx.stroke();
+
+    // === TURRET ===
+    ctx.fillStyle = turretColor;
+    ctx.beginPath();
+    ctx.arc(0, -3*s, 9*s, 0, Math.PI*2);
+    ctx.fill();
+    // Turret hatch
+    ctx.fillStyle = '#000';
+    ctx.beginPath();
+    ctx.arc(0, -3*s, 3*s, 0, Math.PI*2);
+    ctx.fill();
+    ctx.fillStyle = detailColor;
+    ctx.beginPath();
+    ctx.arc(-1*s, -4*s, 1.5*s, 0, Math.PI*2);
+    ctx.fill();
+
+    // === BARREL ===
+    ctx.fillStyle = barrelColor;
+    roundRect(ctx, dir === -1 ? -38*s : 9*s, -5*s, 29*s, 5*s, 2*s);
+    ctx.fill();
+    // Barrel tip
+    ctx.fillStyle = '#111';
+    ctx.beginPath();
+    ctx.arc(dir === -1 ? -38*s : 38*s, -2.5*s, 3*s, 0, Math.PI*2);
+    ctx.fill();
+
+    ctx.restore();
+}
+
+/**
+ * Draw a realistic side-view soldier
+ */
+function drawSoldierIcon(ctx, cx, cy, s, isP1) {
+    const dir = isP1 ? 1 : -1; // P1 faces right (toward enemy), P2 faces left
+
+    const skinColor    = '#f0c09a';
+    const uniformColor = isP1 ? '#1a5276' : '#7b241c';
+    const uniformHigh  = isP1 ? '#2471a3' : '#a93226';
+    const helmetColor  = isP1 ? '#0b3954' : '#641e16';
+    const rifleColor   = '#3d2b1f';
+    const bootColor    = '#1c1c1c';
+    const beltColor    = '#6e5c0a';
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    if (isP1) ctx.scale(-1, 1); // P1 on left side faces RIGHT (mirror the default right-facing sprite)
+
+    // === BOOTS ===
+    ctx.fillStyle = bootColor;
+    // left boot
+    roundRect(ctx, -8*s, 16*s, 6*s, 8*s, 2*s);
+    ctx.fill();
+    ctx.fillRect(-8*s, 20*s, 9*s, 4*s); // toe
+    // right boot
+    roundRect(ctx, 2*s, 16*s, 6*s, 8*s, 2*s);
+    ctx.fill();
+    ctx.fillRect(2*s, 20*s, 9*s, 4*s);
+
+    // === LEGS ===
+    ctx.fillStyle = uniformColor;
+    ctx.fillRect(-7*s, 5*s, 5*s, 13*s);  // left leg
+    ctx.fillRect(2*s, 5*s, 5*s, 13*s);   // right leg
+    // Leg crease
+    ctx.strokeStyle = helmetColor;
+    ctx.lineWidth = 0.8*s;
+    ctx.beginPath(); ctx.moveTo(-4*s, 6*s); ctx.lineTo(-4*s, 16*s); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(4*s, 6*s); ctx.lineTo(4*s, 16*s); ctx.stroke();
+
+    // === BODY / TORSO ===
+    ctx.fillStyle = uniformColor;
+    roundRect(ctx, -9*s, -8*s, 18*s, 16*s, 3*s);
+    ctx.fill();
+    // Chest highlight
+    ctx.fillStyle = uniformHigh;
+    roundRect(ctx, -7*s, -6*s, 7*s, 8*s, 2*s);
+    ctx.fill();
+    // Belt
+    ctx.fillStyle = beltColor;
+    ctx.fillRect(-9*s, 5*s, 18*s, 3*s);
+    // Belt buckle
+    ctx.fillStyle = '#c8a600';
+    ctx.fillRect(-3*s, 5.5*s, 6*s, 2*s);
+
+    // === BACK ARM (behind body) ===
+    ctx.fillStyle = uniformColor;
+    ctx.beginPath();
+    ctx.moveTo(-7*s, -5*s);
+    ctx.lineTo(-12*s, 2*s);
+    ctx.lineTo(-10*s, 4*s);
+    ctx.lineTo(-5*s, -3*s);
+    ctx.fill();
+
+    // === RIGHT ARM (at side) ===
+    ctx.fillStyle = uniformColor;
+    ctx.beginPath();
+    ctx.moveTo(7*s, -4*s);
+    ctx.lineTo(10*s, 4*s);
+    ctx.lineTo(7*s, 5*s);
+    ctx.lineTo(4*s, -3*s);
+    ctx.fill();
+    // Hand
+    ctx.fillStyle = skinColor;
+    ctx.beginPath();
+    ctx.arc(8.5*s, 6*s, 3*s, 0, Math.PI*2);
+    ctx.fill();
+
+    // === NECK ===
+    ctx.fillStyle = skinColor;
+    ctx.fillRect(-3*s, -12*s, 6*s, 5*s);
+
+    // === HEAD ===
+    ctx.fillStyle = skinColor;
+    ctx.beginPath();
+    ctx.arc(0, -17*s, 8*s, 0, Math.PI*2);
+    ctx.fill();
+    // Face features
+    // Eye
+    ctx.fillStyle = '#222';
+    ctx.beginPath();
+    ctx.arc(4*s, -18*s, 1.5*s, 0, Math.PI*2);
+    ctx.fill();
+    // Ear
+    ctx.fillStyle = '#e8b48a';
+    ctx.beginPath();
+    ctx.arc(-7*s, -17*s, 2.5*s, 0, Math.PI*2);
+    ctx.fill();
+
+    // === HELMET ===
+    ctx.fillStyle = helmetColor;
+    ctx.beginPath();
+    ctx.arc(0, -18*s, 9*s, Math.PI, 0, false);
+    ctx.closePath();
+    ctx.fill();
+    // Helmet rim
+    ctx.fillStyle = helmetColor;
+    roundRect(ctx, -10*s, -12*s, 20*s, 3*s, 1*s);
+    ctx.fill();
+    // Helmet camo spots
+    ctx.fillStyle = isP1 ? '#0e2f44' : '#4a0e0e';
+    for (let i = 0; i < 3; i++) {
+        ctx.beginPath();
+        ctx.arc((-4 + i*4)*s, (-20)*s, 2*s, 0, Math.PI*2);
+        ctx.fill();
+    }
+
+    ctx.restore();
+}
+
+// Helper: rounded rectangle path
+function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+}
+
+// ===== GAME FUNCTIONS =====
+function drawTank(x, y, isP1) {
+    drawTankIcon(ctxGame, x, y, 1.0, isP1);
+}
+
+function drawSoldier(x, y, isP1) {
+    drawSoldierIcon(ctxGame, x, y, 0.85, isP1);
+}
+
+function gameLoop() {
+    ctxGame.clearRect(0, 0, canvasGame.width, canvasGame.height);
+
+    ctxGame.setLineDash([10, 10]);
+    ctxGame.strokeStyle = '#999';
+    ctxGame.lineWidth = 2;
+    ctxGame.beginPath();
+    ctxGame.moveTo(midX, 0);
+    ctxGame.lineTo(midX, canvasGame.height);
+    ctxGame.stroke();
+    ctxGame.setLineDash([]);
+
+    [...p1Units, ...p2Units].forEach(u => {
+        if (u.alive) {
+            if (u.type === 'tank') {
+                drawTank(u.x, u.y, u.player === 1);
+            } else {
+                drawSoldier(u.x, u.y, u.player === 1);
+            }
+        }
+    });
+
+    shots.forEach(s => {
+        ctxGame.fillStyle = 'rgba(0, 150, 255, 0.5)';
+        ctxGame.beginPath();
+        ctxGame.arc(s.x, s.y, 8, 0, Math.PI * 2);
+        ctxGame.fill();
+
+        ctxGame.strokeStyle = 'rgba(100, 150, 255, 0.7)';
+        ctxGame.lineWidth = 2;
+        ctxGame.setLineDash([5, 5]);
+        ctxGame.beginPath();
+        ctxGame.moveTo(s.x, s.y);
+        ctxGame.lineTo(s.mx, s.my);
+        ctxGame.stroke();
+        ctxGame.setLineDash([]);
+
+        ctxGame.fillStyle = 'rgba(255, 50, 50, 0.8)';
+        ctxGame.beginPath();
+        ctxGame.arc(s.mx, s.my, 12, 0, Math.PI * 2);
+        ctxGame.fill();
+
+        ctxGame.strokeStyle = 'rgba(200, 0, 0, 1)';
+        ctxGame.lineWidth = 2;
+        ctxGame.stroke();
+    });
+
+    // === EXPLOSIONS ===
+    explosions = explosions.filter(p => p.t < p.maxT);
+    explosions.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vx *= 0.92;
+        p.vy *= 0.92;
+        p.t++;
+        const alpha = 1 - p.t / p.maxT;
+        ctxGame.globalAlpha = alpha;
+        ctxGame.fillStyle = p.color;
+        ctxGame.beginPath();
+        ctxGame.arc(p.x, p.y, p.r * (0.5 + 0.5 * alpha), 0, Math.PI * 2);
+        ctxGame.fill();
+    });
+    ctxGame.globalAlpha = 1;
+
+    requestAnimationFrame(gameLoop);
+}
+
+canvasGame.addEventListener('mousedown', (e) => {
+    if (document.getElementById('overlay').style.display !== 'none') return;
+
+    const rect = canvasGame.getBoundingClientRect();
+    let x = (e.clientX - rect.left) * (canvasGame.width / rect.width);
+    let y = (e.clientY - rect.top) * (canvasGame.height / rect.height);
+    handleShot(x, y);
+});
+
+function handleShot(x, y) {
+
+    if ((currentPlayer === 1 && x < midX) || (currentPlayer === 2 && x > midX)) {
+        playShootSound();
+        let mx = midX + (midX - x);
+        let my = y;
+        shots.push({x, y, mx, my});
+
+        let targets = (currentPlayer === 1) ? p2Units : p1Units;
+        let hit = false;
+
+        targets.forEach(u => {
+            if (u.alive) {
+                let dist = Math.hypot(u.x - mx, u.y - my);
+                if (dist < 30) {
+                    u.alive = false;
+                    if (currentPlayer === 1) p1Score++;
+                    else p2Score++;
+                    hit = true;
+                    // Spawn explosion particles
+                    for (let p = 0; p < 18; p++) {
+                        const angle = Math.random() * Math.PI * 2;
+                        const speed = 2 + Math.random() * 5;
+                        explosions.push({
+                            x: u.x, y: u.y,
+                            vx: Math.cos(angle) * speed,
+                            vy: Math.sin(angle) * speed,
+                            r: 3 + Math.random() * 6,
+                            t: 0, maxT: 40 + Math.random() * 20,
+                            color: ['#ff6600','#ff9900','#ffcc00','#ff3300','#fff'][Math.floor(Math.random()*5)]
+                        });
+                    }
+                }
+            }
+        });
+
+        setTimeout(() => {
+            if (hit) playHitSound();
+            else playMissSound();
+
+            // Check win condition
+            const p2Alive = p2Units.filter(u => u.alive).length;
+            const p1Alive = p1Units.filter(u => u.alive).length;
+            if (p2Alive === 0 || p1Alive === 0) {
+                playVictorySound();
+                setTimeout(() => {
+                    currentPlayer = (currentPlayer === 1) ? 2 : 1;
+                    document.getElementById('overlay').style.display = 'flex';
+                    document.getElementById('msg').innerText = p2Alive === 0 ? '🏆 PEMAIN 1 MENANG!' : '🏆 PEMAIN 2 MENANG!';
+                    document.getElementById('subMsg').innerText = 'Semua pasukan musuh telah hancur!';
+                    updateStats();
+                }, 400);
+                return;
+            }
+
+            currentPlayer = (currentPlayer === 1) ? 2 : 1;
+            document.getElementById('overlay').style.display = 'flex';
+            document.getElementById('msg').innerText = (hit ? '💥 KENA!' : '❌ MISS!');
+            document.getElementById('subMsg').innerText = 'GILIRAN PEMAIN ' + currentPlayer;
+            updateStats();
+        }, 500);
+    }
+}
+
+// Touch support for mobile
+canvasGame.addEventListener('touchstart', (e) => {
+    if (document.getElementById('overlay').style.display !== 'none') return;
+    e.preventDefault();
+    const touch = e.touches[0];
+    const rect = canvasGame.getBoundingClientRect();
+    let x = (touch.clientX - rect.left) * (canvasGame.width / rect.width);
+    let y = (touch.clientY - rect.top) * (canvasGame.height / rect.height);
+    handleShot(x, y);
+}, { passive: false });
+
+function updateStats() {
+    document.getElementById('s1').innerText = p1Score;
+    document.getElementById('s2').innerText = p2Score;
+    document.getElementById('turnTag').innerText = 'GILIRAN: P' + currentPlayer;
+}
+
+function nextTurn() {
+    document.getElementById('overlay').style.display = 'none';
+}
+
+// Initial setup
+resizeCanvas();
+document.getElementById('mainMenu').style.display = 'flex';
+</script>
+</body>
+</html>
