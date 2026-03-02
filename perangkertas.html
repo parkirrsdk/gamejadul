@@ -5,7 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <title>Perang Kertas</title>
+    <meta name="description" content="Perang Kertas - Game strategi pertempuran seru untuk 2 pemain!">
+    <meta property="og:title" content="⚔️ Perang Kertas">
+    <meta property="og:description" content="Game strategi pertempuran 2 pemain di browser!">
+    <meta property="og:type" content="website">
+    <title>⚔️ Perang Kertas</title>
     <style>
         * {
             margin: 0;
@@ -24,15 +28,346 @@
             font-family: 'Arial', sans-serif;
         }
 
-        /* ===== MAIN MENU ===== */
+        /* ===== LANDING PAGE ===== */
+        #landingPage {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #0a0a1a;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            z-index: 3000;
+        }
+
+        /* Animated starfield */
+        #landingPage canvas#bgCanvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .landing-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 20px 60px;
+            min-height: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-top: 20px;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(255,200,0,0.15);
+            border: 1px solid rgba(255,200,0,0.4);
+            color: #ffd700;
+            font-size: clamp(11px, 2.5vw, 13px);
+            padding: 5px 15px;
+            border-radius: 50px;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            animation: fadeInDown 0.6s ease;
+        }
+
+        .hero-title {
+            font-size: clamp(42px, 12vw, 90px);
+            font-weight: 900;
+            line-height: 1;
+            margin-bottom: 10px;
+            animation: fadeInDown 0.7s ease;
+            background: linear-gradient(135deg, #fff 0%, #a78bfa 50%, #f472b6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 0 30px rgba(167,139,250,0.5));
+        }
+
+        .hero-subtitle {
+            font-size: clamp(14px, 3.5vw, 20px);
+            color: rgba(255,255,255,0.65);
+            margin-bottom: 35px;
+            animation: fadeInDown 0.8s ease;
+            letter-spacing: 0.5px;
+        }
+
+        /* Live demo canvas preview */
+        .preview-wrapper {
+            position: relative;
+            margin-bottom: 40px;
+            animation: fadeIn 1s ease 0.3s both;
+        }
+
+        .preview-frame {
+            border: 2px solid rgba(167,139,250,0.4);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 0 60px rgba(167,139,250,0.2), 0 20px 60px rgba(0,0,0,0.5);
+            width: min(500px, 90vw);
+            height: min(260px, 45vw);
+            background: #fff;
+            position: relative;
+        }
+
+        #previewCanvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        .preview-badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(90deg, #7c3aed, #db2777);
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 4px 16px;
+            border-radius: 50px;
+            white-space: nowrap;
+            letter-spacing: 1px;
+        }
+
+        /* CTA Buttons */
+        .cta-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 50px;
+            animation: fadeInUp 0.8s ease 0.4s both;
+        }
+
+        .btn-play {
+            padding: 16px 40px;
+            font-size: clamp(16px, 4vw, 20px);
+            font-weight: 800;
+            background: linear-gradient(135deg, #7c3aed, #db2777);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 8px 30px rgba(124,58,237,0.5);
+            letter-spacing: 0.5px;
+            width: auto;
+        }
+
+        .btn-play:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 12px 40px rgba(124,58,237,0.7);
+        }
+
+        .btn-play:active { transform: scale(0.97); }
+
+        .btn-how {
+            padding: 16px 30px;
+            font-size: clamp(14px, 3.5vw, 17px);
+            font-weight: 600;
+            background: rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.85);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: auto;
+        }
+
+        .btn-how:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateY(-2px);
+        }
+
+        /* Features */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            width: 100%;
+            max-width: 700px;
+            margin-bottom: 50px;
+            animation: fadeInUp 0.8s ease 0.5s both;
+        }
+
+        .feature-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            background: rgba(167,139,250,0.08);
+            border-color: rgba(167,139,250,0.3);
+            transform: translateY(-3px);
+        }
+
+        .feature-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .feature-title {
+            color: white;
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .feature-desc {
+            color: rgba(255,255,255,0.5);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        /* How to play */
+        .howto {
+            width: 100%;
+            max-width: 700px;
+            margin-bottom: 50px;
+            animation: fadeInUp 0.8s ease 0.6s both;
+        }
+
+        .section-title {
+            color: white;
+            font-size: clamp(18px, 4vw, 24px);
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(90deg, #7c3aed, #db2777);
+            border-radius: 3px;
+            margin: 8px auto 0;
+        }
+
+        .steps {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .step {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 12px;
+            padding: 15px 18px;
+        }
+
+        .step-num {
+            background: linear-gradient(135deg, #7c3aed, #db2777);
+            color: white;
+            font-weight: 900;
+            font-size: 14px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .step-text {
+            color: rgba(255,255,255,0.8);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .step-text strong {
+            color: white;
+        }
+
+        /* Units showcase */
+        .units-showcase {
+            width: 100%;
+            max-width: 700px;
+            margin-bottom: 50px;
+            animation: fadeInUp 0.8s ease 0.7s both;
+        }
+
+        .units-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .unit-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .unit-preview {
+            border-radius: 10px;
+            overflow: hidden;
+            background: white;
+        }
+
+        .unit-name {
+            color: white;
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .unit-info {
+            color: rgba(255,255,255,0.5);
+            font-size: 12px;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        /* Footer */
+        .landing-footer {
+            text-align: center;
+            color: rgba(255,255,255,0.3);
+            font-size: 13px;
+            padding-top: 10px;
+            animation: fadeIn 1s ease 0.8s both;
+        }
+
+        .landing-footer a {
+            color: rgba(167,139,250,0.7);
+            text-decoration: none;
+        }
+
+        /* ===== MAIN MENU (mode select) ===== */
         #mainMenu {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a0a2e 50%, #0a1a2e 100%);
+            display: none;
             flex-direction: column;
             align-items: center;
             justify-content: center;
@@ -42,36 +377,119 @@
 
         .menu-container {
             text-align: center;
-            background: rgba(255, 255, 255, 0.1);
-            padding: clamp(20px, 5vw, 40px);
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.06);
+            padding: clamp(30px, 5vw, 50px) clamp(25px, 6vw, 60px);
+            border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.12);
+            backdrop-filter: blur(20px);
             width: 100%;
-            max-width: 500px;
+            max-width: 480px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
         }
 
         .menu-container h1 {
             color: white;
-            font-size: clamp(32px, 8vw, 48px);
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            font-size: clamp(28px, 7vw, 40px);
+            margin-bottom: 8px;
+            font-weight: 900;
         }
 
-        .menu-container p {
-            color: #fff;
-            font-size: clamp(14px, 4vw, 18px);
+        .menu-subtitle {
+            color: rgba(255,255,255,0.5);
+            font-size: clamp(13px, 3vw, 15px);
             margin-bottom: 30px;
         }
 
-        .button-group {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+        /* Mode cards */
+        .mode-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
             margin-bottom: 20px;
         }
 
+        .mode-card {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 20px 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            width: 100%;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .mode-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(167,139,250,0.5);
+            background: rgba(124,58,237,0.15);
+            box-shadow: 0 8px 25px rgba(124,58,237,0.3);
+        }
+
+        .mode-card .mode-icon {
+            font-size: 36px;
+        }
+
+        .mode-card .mode-title {
+            font-size: clamp(13px, 3vw, 15px);
+            font-weight: 700;
+        }
+
+        .mode-card .mode-desc {
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .mode-card.single { border-color: rgba(59,130,246,0.3); }
+        .mode-card.single:hover { border-color: rgba(59,130,246,0.7); background: rgba(59,130,246,0.15); box-shadow: 0 8px 25px rgba(59,130,246,0.3); }
+        .mode-card.double { border-color: rgba(239,68,68,0.3); }
+        .mode-card.double:hover { border-color: rgba(239,68,68,0.7); background: rgba(239,68,68,0.15); box-shadow: 0 8px 25px rgba(239,68,68,0.3); }
+
+        .btn-back-landing {
+            margin-top: 5px;
+            background: transparent;
+            color: rgba(255,255,255,0.5);
+            border: none;
+            font-size: 13px;
+            cursor: pointer;
+            padding: 8px;
+            width: auto;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .btn-back-landing:hover {
+            color: white;
+            background: transparent;
+            transform: none;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
         button {
-            padding: clamp(12px 20px, 3vw 5vw, 15px 30px);
+            padding: 12px 20px;
             font-size: clamp(14px, 4vw, 18px);
             cursor: pointer;
             background: #27ae60;
@@ -401,15 +819,128 @@
 </head>
 <body>
 
-<!-- MENU UTAMA -->
+<!-- ===== LANDING PAGE ===== -->
+<div id="landingPage">
+    <canvas id="bgCanvas"></canvas>
+
+    <div class="landing-content">
+
+        <!-- Hero -->
+        <div class="hero">
+            <div class="hero-badge">🎮 Game Strategi Browser</div>
+            <h1 class="hero-title">⚔️ Perang<br>Kertas</h1>
+            <p class="hero-subtitle">Susun pasukanmu, bidik musuh, dan menangkan pertempuran!</p>
+        </div>
+
+        <!-- Preview Canvas -->
+        <div class="preview-wrapper">
+            <span class="preview-badge">✨ PREVIEW LIVE</span>
+            <div class="preview-frame">
+                <canvas id="previewCanvas"></canvas>
+            </div>
+        </div>
+
+        <!-- CTA -->
+        <div class="cta-group">
+            <button class="btn-play" onclick="showModeSelect()">🎮 Mulai Bermain</button>
+            <button class="btn-how" onclick="document.getElementById('howto').scrollIntoView({behavior:'smooth'})">📖 Cara Bermain</button>
+        </div>
+
+        <!-- Features -->
+        <div class="features">
+            <div class="feature-card">
+                <span class="feature-icon">🤖</span>
+                <div class="feature-title">Single Player</div>
+                <div class="feature-desc">Lawan AI komputer yang cerdas</div>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">👥</span>
+                <div class="feature-title">Double Player</div>
+                <div class="feature-desc">Tantang temanmu dalam 1 layar</div>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">📱</span>
+                <div class="feature-title">Responsif</div>
+                <div class="feature-desc">Bisa dimainkan di HP & PC</div>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">💥</span>
+                <div class="feature-title">Efek Suara</div>
+                <div class="feature-desc">Ledakan & efek audio seru</div>
+            </div>
+        </div>
+
+        <!-- How to Play -->
+        <div class="howto" id="howto">
+            <h2 class="section-title">Cara Bermain</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-num">1</div>
+                    <div class="step-text"><strong>Pilih mode permainan</strong> — Single Player vs AI atau Double Player berdua teman.</div>
+                </div>
+                <div class="step">
+                    <div class="step-num">2</div>
+                    <div class="step-text"><strong>Susun posisi pasukan</strong> — Klik unit di daftar, lalu klik di peta untuk menempatkannya di wilayahmu.</div>
+                </div>
+                <div class="step">
+                    <div class="step-num">3</div>
+                    <div class="step-text"><strong>Bidik musuh</strong> — Klik di wilayahmu untuk menembak ke posisi yang simetris di wilayah musuh.</div>
+                </div>
+                <div class="step">
+                    <div class="step-num">4</div>
+                    <div class="step-text"><strong>Giliran bergantian</strong> — Setiap pemain mendapat 1 tembakan per giliran. Hancurkan semua pasukan musuh untuk menang! 🏆</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Units Showcase -->
+        <div class="units-showcase">
+            <h2 class="section-title">Unit Pasukan</h2>
+            <div class="units-grid">
+                <div class="unit-card">
+                    <div class="unit-preview">
+                        <canvas id="tankPreviewCanvas" width="120" height="80"></canvas>
+                    </div>
+                    <div class="unit-name">🛡️ Tank</div>
+                    <div class="unit-info">Unit lapis baja kuat. Tersedia 3 unit per pemain.</div>
+                </div>
+                <div class="unit-card">
+                    <div class="unit-preview">
+                        <canvas id="soldierPreviewCanvas" width="120" height="80"></canvas>
+                    </div>
+                    <div class="unit-name">🪖 Tentara</div>
+                    <div class="unit-info">Unit infanteri gesit. Tersedia 3 unit per pemain.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="landing-footer">
+            <p>⚔️ Perang Kertas — Dibuat dengan HTML5 Canvas &amp; Web Audio API</p>
+            <p style="margin-top:6px;">Tidak perlu install, langsung main di browser! 🎮</p>
+        </div>
+
+    </div>
+</div>
+
+<!-- ===== MODE SELECT MENU ===== -->
 <div id="mainMenu">
     <div class="menu-container">
-        <h1>⚔️ PERANG KERTAS ⚔️</h1>
-        <p>Pilih Mode Permainan</p>
-        <div class="button-group">
-            <button class="btn-single" onclick="selectMode('single')">🤖 Single Player<br>(vs Komputer)</button>
-            <button class="btn-double" onclick="selectMode('double')">👥 Double Player<br>(1 vs 1)</button>
+        <h1>⚔️ Perang Kertas</h1>
+        <p class="menu-subtitle">Pilih mode permainan</p>
+        <div class="mode-cards">
+            <button class="mode-card single" onclick="selectMode('single')">
+                <span class="mode-icon">🤖</span>
+                <span class="mode-title">Single Player</span>
+                <span class="mode-desc">vs Komputer</span>
+            </button>
+            <button class="mode-card double" onclick="selectMode('double')">
+                <span class="mode-icon">👥</span>
+                <span class="mode-title">Double Player</span>
+                <span class="mode-desc">1 vs 1 Lokal</span>
+            </button>
         </div>
+        <button class="btn-back-landing" onclick="backToLanding()">← Kembali ke Halaman Utama</button>
     </div>
 </div>
 
@@ -816,6 +1347,16 @@ function goBackToMenu() {
     document.getElementById('mainMenu').style.display = 'flex';
 }
 
+function backToLanding() {
+    document.getElementById('mainMenu').style.display = 'none';
+    document.getElementById('landingPage').style.display = 'flex';
+}
+
+function showModeSelect() {
+    document.getElementById('landingPage').style.display = 'none';
+    document.getElementById('mainMenu').style.display = 'flex';
+}
+
 function selectMode(mode) {
     gameMode = mode;
     initSetup();
@@ -934,16 +1475,6 @@ function drawTankIcon(ctx, cx, cy, s, isP1) {
     ctx.fillStyle = detailColor;
     ctx.beginPath();
     ctx.arc(-1*s, -4*s, 1.5*s, 0, Math.PI*2);
-    ctx.fill();
-
-    // === BARREL ===
-    ctx.fillStyle = barrelColor;
-    roundRect(ctx, dir === -1 ? -38*s : 9*s, -5*s, 29*s, 5*s, 2*s);
-    ctx.fill();
-    // Barrel tip
-    ctx.fillStyle = '#111';
-    ctx.beginPath();
-    ctx.arc(dir === -1 ? -38*s : 38*s, -2.5*s, 3*s, 0, Math.PI*2);
     ctx.fill();
 
     ctx.restore();
@@ -1253,9 +1784,127 @@ function nextTurn() {
     document.getElementById('overlay').style.display = 'none';
 }
 
+// ===== STARFIELD BACKGROUND =====
+function initStarfield() {
+    const bg = document.getElementById('bgCanvas');
+    const bctx = bg.getContext('2d');
+    const stars = [];
+    function resize() { bg.width = window.innerWidth; bg.height = window.innerHeight; }
+    resize();
+    window.addEventListener('resize', resize);
+    for (let i = 0; i < 150; i++) {
+        stars.push({
+            x: Math.random(), y: Math.random(),
+            r: Math.random() * 1.5 + 0.3,
+            a: Math.random(), da: (Math.random() - 0.5) * 0.01
+        });
+    }
+    function draw() {
+        bctx.clearRect(0, 0, bg.width, bg.height);
+        stars.forEach(s => {
+            s.a = Math.max(0.05, Math.min(1, s.a + s.da));
+            if (s.a <= 0.05 || s.a >= 1) s.da *= -1;
+            bctx.globalAlpha = s.a;
+            bctx.fillStyle = '#fff';
+            bctx.beginPath();
+            bctx.arc(s.x * bg.width, s.y * bg.height, s.r, 0, Math.PI * 2);
+            bctx.fill();
+        });
+        bctx.globalAlpha = 1;
+        requestAnimationFrame(draw);
+    }
+    draw();
+}
+
+// ===== LANDING PREVIEW CANVAS =====
+function initPreview() {
+    const pc = document.getElementById('previewCanvas');
+    const pctx = pc.getContext('2d');
+    function resizePreview() {
+        const frame = pc.parentElement;
+        pc.width = frame.offsetWidth;
+        pc.height = frame.offsetHeight;
+    }
+    resizePreview();
+    window.addEventListener('resize', resizePreview);
+
+    // Fake units for preview animation
+    const previewUnits = [
+        {x:0.12,y:0.3,type:'tank',p:1}, {x:0.22,y:0.6,type:'soldier',p:1},
+        {x:0.18,y:0.75,type:'tank',p:1}, {x:0.28,y:0.45,type:'soldier',p:1},
+        {x:0.78,y:0.28,type:'tank',p:2}, {x:0.68,y:0.55,type:'soldier',p:2},
+        {x:0.82,y:0.65,type:'tank',p:2}, {x:0.72,y:0.82,type:'soldier',p:2},
+    ];
+    let previewShots = [];
+    let shotTimer = 0;
+
+    function drawPreview() {
+        const W = pc.width, H = pc.height;
+        pctx.fillStyle = '#fff';
+        pctx.fillRect(0, 0, W, H);
+        // midline
+        pctx.setLineDash([8,8]);
+        pctx.strokeStyle = '#bbb';
+        pctx.lineWidth = 1.5;
+        pctx.beginPath(); pctx.moveTo(W/2,0); pctx.lineTo(W/2,H); pctx.stroke();
+        pctx.setLineDash([]);
+
+        const s = Math.min(W, H) / 380;
+        previewUnits.forEach(u => {
+            const x = u.x * W, y = u.y * H;
+            if (u.type === 'tank') drawTankIcon(pctx, x, y, s * 0.65, u.p === 1);
+            else drawSoldierIcon(pctx, x, y, s * 0.55, u.p === 1);
+        });
+
+        // Animate shots
+        shotTimer++;
+        if (shotTimer % 90 === 0) {
+            const shooter = previewUnits[Math.floor(Math.random() * 4)];
+            const sx = shooter.x * W, sy = shooter.y * H;
+            const tx = (1 - shooter.x) * W, ty = sy;
+            previewShots.push({x:sx,y:sy,tx,ty,t:0,maxT:50});
+        }
+        previewShots = previewShots.filter(s => s.t < s.maxT);
+        previewShots.forEach(sh => {
+            sh.t++;
+            const prog = sh.t / sh.maxT;
+            const cx = sh.x + (sh.tx - sh.x) * prog;
+            const cy = sh.y + (sh.ty - sh.y) * prog;
+            pctx.fillStyle = `rgba(255,100,0,${1-prog})`;
+            pctx.beginPath();
+            pctx.arc(cx, cy, 5*(1-prog*0.5), 0, Math.PI*2);
+            pctx.fill();
+        });
+
+        requestAnimationFrame(drawPreview);
+    }
+    drawPreview();
+}
+
+// ===== UNIT PREVIEW CARDS =====
+function initUnitPreviews() {
+    const tankC = document.getElementById('tankPreviewCanvas');
+    const tctx = tankC.getContext('2d');
+    tctx.fillStyle = '#fff';
+    tctx.fillRect(0, 0, 120, 80);
+    drawTankIcon(tctx, 60, 45, 0.9, true);
+
+    const soldierC = document.getElementById('soldierPreviewCanvas');
+    const sctx = soldierC.getContext('2d');
+    sctx.fillStyle = '#fff';
+    sctx.fillRect(0, 0, 120, 80);
+    drawSoldierIcon(sctx, 60, 50, 0.75, true);
+}
+
 // Initial setup
 resizeCanvas();
-document.getElementById('mainMenu').style.display = 'flex';
+initStarfield();
+setTimeout(() => {
+    initPreview();
+    initUnitPreviews();
+}, 100);
+document.getElementById('landingPage').style.display = 'flex';
+document.getElementById('mainMenu').style.display = 'none';
 </script>
 </body>
 </html>
